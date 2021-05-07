@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+
+<div id="app">
+    <input type="button" value="开始测量" @click="beginWork"> <br>
+    <input type="button" value="结束测量" @click="endWork"> <br>
+    <input type="button" value="通道一" @click="passagewayOne"> <br>
+    <input type="button" value="通道二" @click="passagewayTwo"> <br>
+    <input type="button" value="通道三" @click="passagewayThree"> <br>
+    <input type="button" value="通道四" @click="passagewayFour"> <br>
+    <!--为echarts准备一个容器，画图就画在里面-->
+    <div id="box" style="width: 600px;height: 600px;margin: auto;"></div>
+</div>
+
+
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+            msg: "vue 生命周期",
+            data: [],
+        },
+        methods: {
+            beginWork(){},
+            endWork(){},
+            passagewayOne(){},
+            passagewayTwo(){},
+            passagewayThree(){},
+            passagewayFour(){}
+
+        },
+        computed: {},
+        created() {
+            //发送axios请求
+            axios.get("http://localhost:8080/gatdata").then(res=>{
+                this.data =  res.data;
+            });
+            //this.users = [{id: 1, name: "小陈", age: 23, salary: 2400, description: "他是一个小白!!!"}]
+        }
+    })
+
+    //初始化ehcharts实例
+    var myChart = echarts.init(document.getElementById("box"));
+    //指定图表的配置项和数据
+    var option = {
+        //标题
+        title: {
+            text: '生鲜销量统计'
+        },
+        //工具箱
+        //保存图片
+        toolbox: {
+            show: true,
+            feature: {
+                saveAsImage: {
+                    show: true
+                }
+            }
+        },
+        //图例-每一条数据的名字叫销量
+        legend: {
+            data: ['销量']
+        },
+        //x轴
+        xAxis: {
+            data: ["苹果", "橘子", "橙子", "香蕉", "菠萝", "榴莲"]
+        },
+        //y轴没有显式设置，根据值自动生成y轴
+        yAxis: {},
+        //数据-data是最终要显示的数据
+        series: [{
+            name: '销量',
+            type: 'line',
+            data: [40, 20, 35, 60, 55, 10]
+        }]
+    };
+    //使用刚刚指定的配置项和数据项显示图表
+    myChart.setOption(option);
+</script>
+</body>
+<head>
+    <meta charset="UTF-8">
+    <title>折线图</title>
+    <script src="js/echarts.js"></script>
+    <script src="js/axios.min.js"></script>
+    <script src="js/vue.js"></script>
+</head>
+</html>
