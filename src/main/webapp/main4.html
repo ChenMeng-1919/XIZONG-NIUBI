@@ -1,22 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title></title>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <script src="js/echarts.js"></script>
     <script src="js/axios.min.js"></script>
     <script src="js/vue.js"></script>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            box-sizing: border-box;
+            padding-top: 20vh;
+        }
+
+        #app {
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .btn-list {
+            position: fixed;
+            display: flex;
+            bottom: 10vh;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .btn-list>input{
+            margin-left: 10px;
+        }
+
+        #box {
+            width: 70vw !important;
+            height: 60vh !important;
+            margin: 0 auto;
+        }
+    </style>
 </head>
 <body>
-
 <div id="app">
-    <title>{{msg}}</title>
-    <!--为echarts准备一个容器，画图就画在里面-->
-    <div id="box" style="width: 600px;height: 600px; margin: auto;"></div>
-    <div style= "margin-left:633px;">
+    <div class="btn-list">
         <input type="button" value="开始测量" @click="beginWork">
         <input type="button" value="结束测量" @click="endWork">
+        <input type="button" value="通道一" @click="passagewayOne">
+        <input type="button" value="通道二" @click="passagewayTwo">
+        <input type="button" value="通道三" @click="passagewayThree">
+        <input type="button" value="通道四" @click="passagewayFour">
     </div>
+
+    <!--为echarts准备一个容器，画图就画在里面-->
+    <div id="box"></div>
 </div>
 
 
@@ -25,20 +62,19 @@
         el: "#app",
         staus: "",
         myChart: "",
-        dataStaus: {passage1: true, passage2: true, passage3: true, passage4: true},
         data: {
             msg: "四通道传感器测量",
             data: [],
             //指定图表的配置项和数据
             option: {
                 title: {
-                    text: '传感器测量值'
+                    text: '折线图堆叠'
                 },
                 tooltip: {
                     trigger: 'axis'
                 },
                 legend: {
-                    data: ['通道1', '通道2', '通道3', '通道4']
+                    data: ['邮件营销', '联盟广告', '视频广告', '直接访问', '搜索引擎']
                 },
                 grid: {
                     left: '3%',
@@ -54,65 +90,59 @@
                 xAxis: {
                     type: 'category',
                     boundaryGap: false,
-                    data: ['1', '2', '3', '4', '5', '6', '7','8']
+                    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
                 },
                 yAxis: {
                     type: 'value'
                 },
                 series: [
                     {
-                        name: '通道1',
+                        name: '邮件营销',
                         type: 'line',
                         stack: '总量',
-                       /* data: [120, 132, 101, 134, 90, 230, 210]*/
-                        data: []
+                        data: [120, 132, 101, 134, 90, 230, 210]
                     },
                     {
-                        name: '通道2',
+                        name: '联盟广告',
                         type: 'line',
                         stack: '总量',
-                        /*data: [220, 182, 191, 234, 290, 330, 310]*/
-                        data: []
+                        data: [220, 182, 191, 234, 290, 330, 310]
                     },
                     {
-                        name: '通道3',
+                        name: '视频广告',
                         type: 'line',
                         stack: '总量',
-                       /* data: [150, 232, 201, 154, 190, 330, 410]*/
-                        data: []
+                        data: [150, 232, 201, 154, 190, 330, 410]
                     },
                     {
-                        name: '通道4',
+                        name: '直接访问',
                         type: 'line',
                         stack: '总量',
-                        /*data: [320, 332, 301, 334, 390, 330, 320]*/
-                        data: []
-                    }/*,
+                        data: [320, 332, 301, 334, 390, 330, 320]
+                    },
                     {
-                        name: '通道5',
+                        name: '搜索引擎',
                         type: 'line',
                         stack: '总量',
                         data: [820, 932, 901, 934, 1290, 1330, 1320]
-                    }*/
+                    }
                 ]
             }
         },
         methods: {
             beginWork() {
-                //this.getdata();
-                this.staus = self.setInterval(this.getdata, 2000);
+                this.staus = self.setInterval(this.getdata(), 2000);
             },
             getdata() {
-                axios.post("http://localhost:8080/getData",this.data.option.series).then(res => {
-                        /*this.option.series[0].data = res.data.listA;
-                        this.option.series[1].data = res.data.listB;
-                        this.option.series[2].data = res.data.listC;
-                        this.option.series[3].data = res.data.listD;*/
-                    }
-                );
-                //使用刚刚指定的配置项和数据项显示图表
-                //this.myChart.setOption(this.option);
-                this.myChart.setOption(this.option, true);
+                axios.get("http://localhost:8080/getData")
+                    .then(res => {
+                        // this.option.series = res.data[0];
+                        // this.option.legend = res.data[1];
+                        //使用刚刚指定的配置项和数据项显示图表
+
+                        this.myChart.setOption(this.option, true);//重绘
+                    });
+
             },
             endWork() {
                 if (this.staus !== null) {
@@ -128,10 +158,6 @@
             },
             passagewayFour() {
             }
-
-        },
-        computed: {},
-        created() {
 
         },
         mounted() {

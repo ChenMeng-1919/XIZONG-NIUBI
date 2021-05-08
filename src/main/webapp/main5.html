@@ -103,11 +103,11 @@
                 this.staus = self.setInterval(this.getdata, 2000);
             },
             getdata() {
-                axios.post("http://localhost:8080/getData",this.data.option.series).then(res => {
-                        /*this.option.series[0].data = res.data.listA;
+                axios.get("http://localhost:8080/getData",this.data.option).then(res => {
+                        this.option.series[0].data = res.data.listA;
                         this.option.series[1].data = res.data.listB;
                         this.option.series[2].data = res.data.listC;
-                        this.option.series[3].data = res.data.listD;*/
+                        this.option.series[3].data = res.data.listD;
                     }
                 );
                 //使用刚刚指定的配置项和数据项显示图表
