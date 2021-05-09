@@ -31,72 +31,10 @@
             msg2:"高总牛逼",
             /*data: {data:[],},*/
             //指定图表的配置项和数据
-            option: {
-                title: {
-                    text: '传感器测量值'
-                },
-                tooltip: {
-                    trigger: 'axis'
-                },
-                legend: {
-                    data: ['通道1', '通道2', '通道3', '通道4']
-                },
-                grid: {
-                    left: '3%',
-                    right: '4%',
-                    bottom: '3%',
-                    containLabel: true
-                },
-                toolbox: {
-                    feature: {
-                        saveAsImage: {}
-                    }
-                },
-                xAxis: {
-                    type: 'category',
-                    boundaryGap: false,
-                    data: ['1', '2', '3', '4', '5', '6', '7','8']
-                },
-                yAxis: {
-                    type: 'value'
-                },
-                series: [
-                    {
-                        name: '通道1',
-                        type: 'line',
-                        stack: '总量',
-                       /* data: [120, 132, 101, 134, 90, 230, 210]*/
-                        data: []
-                    },
-                    {
-                        name: '通道2',
-                        type: 'line',
-                        stack: '总量',
-                        /*data: [220, 182, 191, 234, 290, 330, 310]*/
-                        data: []
-                    },
-                    {
-                        name: '通道3',
-                        type: 'line',
-                        stack: '总量',
-                       /* data: [150, 232, 201, 154, 190, 330, 410]*/
-                        data: []
-                    },
-                    {
-                        name: '通道4',
-                        type: 'line',
-                        stack: '总量',
-                        /*data: [320, 332, 301, 334, 390, 330, 320]*/
-                        data: []
-                    }/*,
-                    {
-                        name: '通道5',
-                        type: 'line',
-                        stack: '总量',
-                        data: [820, 932, 901, 934, 1290, 1330, 1320]
-                    }*/
-                ]
-            }
+            passage1: [],
+            passage2: [],
+            passage3: [],
+            passage4: [],
         },
         methods: {
             beginWork() {
@@ -111,16 +49,19 @@
                         this.option.series[3].data = res.data.listD;
                     }
                 );*/
-                axios.post("http://localhost:8080/getData",this.option.series).then(res => {
-                        this.option.series[0].data = res.data.listA;
-                        this.option.series[1].data = res.data.listB;
-                        this.option.series[2].data = res.data.listC;
-                        this.option.series[3].data = res.data.listD;
-                    }
-                );
-                //使用刚刚指定的配置项和数据项显示图表
+                axios.post(
+                    "http://localhost:8080/getData",
+                    this.option.series // 这传参为什么传 echarts 的配置项
+                ).then(res => {
+                    // 你这 listABCD 的命名也是有点毛病……
+                    this.passage1 = res.data.listA;
+                    this.passage2 = res.data.listB;
+                    this.passage3 = res.data.listC;
+                    this.passage4 = res.data.listD;
+                    //使用刚刚指定的配置项和数据项显示图表
+                    this.myChart.setOption(this.option, true);
+                });
                 //this.myChart.setOption(this.option);
-                this.myChart.setOption(this.option, true);
             },
             endWork() {
                 if (this.staus !== null) {
@@ -135,18 +76,96 @@
             passagewayThree() {
             },
             passagewayFour() {
+            },
+            resize() {
+                if (this.myChart) this.myChart.resize();
             }
-
         },
-        computed: {},
-        created() {
-
+        computed: {
+            option() {
+                return {
+                    title: {
+                        text: '传感器测量值'
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data: ['通道1', '通道2', '通道3', '通道4']
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: ['1', '2', '3', '4', '5', '6', '7','8']
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [
+                        {
+                            name: '通道1',
+                            type: 'line',
+                            stack: '总量',
+                        /* data: [120, 132, 101, 134, 90, 230, 210]*/
+                            data: this.passage1
+                        },
+                        {
+                            name: '通道2',
+                            type: 'line',
+                            stack: '总量',
+                            /*data: [220, 182, 191, 234, 290, 330, 310]*/
+                            data: this.passage2
+                        },
+                        {
+                            name: '通道3',
+                            type: 'line',
+                            stack: '总量',
+                        /* data: [150, 232, 201, 154, 190, 330, 410]*/
+                            data: this.passage3
+                        },
+                        {
+                            name: '通道4',
+                            type: 'line',
+                            stack: '总量',
+                            /*data: [320, 332, 301, 334, 390, 330, 320]*/
+                            data: this.passage4
+                        }/*,
+                        {
+                            name: '通道5',
+                            type: 'line',
+                            stack: '总量',
+                            data: [820, 932, 901, 934, 1290, 1330, 1320]
+                        }*/
+                    ]
+                }
+            }
         },
         mounted() {
             document.querySelector('title').innerText = this.msg
             //初始化ehcharts实例
             this.myChart = echarts.init(document.getElementById("box"));
+            window.addEventListener('resize', this.resize);
             //this.getdata() //初始化
+        },
+        beforeDestroy() {
+            if (this.myChart) {
+                // 组件销毁时内存回收
+                this.myChart.clear();
+                this.myChart.dispose();
+                this.myChart = null;
+                window.removeEventListener('resize', this.resize);
+            }
         }
     })
     /*//初始化ehcharts实例
