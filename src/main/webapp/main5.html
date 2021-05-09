@@ -23,12 +23,13 @@
 <script>
     var app = new Vue({
         el: "#app",
-        staus: "",
-        myChart: "",
-        dataStaus: {passage1: true, passage2: true, passage3: true, passage4: true},
         data: {
+            staus: "",
+            myChart: "",
+            dataStaus: {passage1: true, passage2: true, passage3: true, passage4: true},
             msg: "四通道传感器测量",
-            data: [],
+            msg2:"高总牛逼",
+            /*data: {data:[],},*/
             //指定图表的配置项和数据
             option: {
                 title: {
@@ -103,7 +104,14 @@
                 this.staus = self.setInterval(this.getdata, 2000);
             },
             getdata() {
-                axios.get("http://localhost:8080/getData",this.data.option).then(res => {
+                /*axios.post("http://localhost:8080/getData",{"小陈说":this.msg2}).then(res => {
+                        this.option.series[0].data = res.data.listA;
+                        this.option.series[1].data = res.data.listB;
+                        this.option.series[2].data = res.data.listC;
+                        this.option.series[3].data = res.data.listD;
+                    }
+                );*/
+                axios.post("http://localhost:8080/getData",this.option.series).then(res => {
                         this.option.series[0].data = res.data.listA;
                         this.option.series[1].data = res.data.listB;
                         this.option.series[2].data = res.data.listC;
@@ -138,7 +146,7 @@
             document.querySelector('title').innerText = this.msg
             //初始化ehcharts实例
             this.myChart = echarts.init(document.getElementById("box"));
-            this.getdata() //初始化
+            //this.getdata() //初始化
         }
     })
     /*//初始化ehcharts实例
